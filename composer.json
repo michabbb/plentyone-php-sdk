@@ -1,0 +1,26 @@
+{
+    "name": "macropage/plentyone-php-sdk",
+    "description": "PlentyOne REST API SDK based on Saloon PHP",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "macropage",
+            "email": "info@macropage.de"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "saloonphp/saloon": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PlentyOne\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PlentyOne\\Tests\\": "tests/"
+        }
+    }
+}
