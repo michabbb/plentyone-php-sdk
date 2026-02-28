@@ -1,0 +1,103 @@
+# PlentyOne PHP SDK
+
+A lightweight PHP SDK for the [PlentyONE REST API](https://developers.plentymarkets.com), built on [Saloon PHP v3](https://docs.saloon.dev).
+
+## Requirements
+
+- PHP 8.2+
+- Composer
+
+## Installation
+
+```bash
+composer require macropage/plentyone-php-sdk
+```
+
+## Quick Start
+
+```php
+use PlentyOne\PlentyOneConnector;
+
+$connector = new PlentyOneConnector('https://your-instance.plentymarkets.com/rest');
+$connector->login('username', 'password');
+
+// Find a variation by SKU
+$response = $connector->variations()->find('YOUR-SKU');
+$variation = $response->json('entries.0');
+
+// Get all images for an item
+$images = $connector->images()->forItem($variation['itemId'])->json();
+```
+
+## Authentication
+
+The SDK handles Bearer token authentication automatically. After calling `login()`, the token is stored in memory and sent with every request. If the token expires (24h), the SDK re-authenticates automatically before the next request.
+
+```php
+$connector = new PlentyOneConnector('https://your-instance.plentymarkets.com/rest');
+$connector->login('username', 'password');
+
+// All subsequent calls are authenticated
+```
+
+## Supported API Calls
+
+### Variations
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `variations()->find(string $numberExact)` | Find variation by SKU | `GET /rest/items/variations?numberExact=...` |
+| `variations()->get(int $itemId, int $variationId)` | Get a specific variation | `GET /rest/items/{id}/variations/{varId}` |
+| `variations()->list(array $filters)` | List variations with filters | `GET /rest/items/variations` |
+
+**Available filters for `list()`:** `numberExact`, `id`, `isActive`, `page`, `itemsPerPage`
+
+### Images
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `images()->forItem(int $itemId)` | Get all images of an item | `GET /rest/items/{id}/images` |
+| `images()->forVariation(int $itemId, int $variationId)` | Get variation image links | `GET /rest/.../variation_images` |
+| `images()->upload(...)` | Upload an image (via URL or base64) | `POST /rest/items/{id}/images/upload` |
+| `images()->updatePosition(int $itemId, int $imageId, int $position)` | Change image sort order | `PUT /rest/items/{id}/images/{imgId}` |
+| `images()->delete(int $itemId, int $imageId)` | Delete an image | `DELETE /rest/items/{id}/images/{imgId}` |
+| `images()->linkToVariation(int $itemId, int $variationId, int $imageId)` | Link image to a variation | `POST /rest/.../variation_images` |
+| `images()->unlinkFromVariation(int $itemId, int $variationId, int $imageId)` | Unlink image from a variation | `DELETE /rest/.../variation_images/{imgId}` |
+
+#### Upload via URL
+
+```php
+$response = $connector->images()->upload(
+    itemId: 668423,
+    uploadUrl: 'https://example.com/image.png',
+    position: 0,
+    name: 'Product front',
+    alternate: 'Alt text for SEO',
+);
+$imageId = $response->json('id');
+```
+
+#### Upload via base64
+
+```php
+$base64 = base64_encode(file_get_contents('/path/to/image.png'));
+
+$response = $connector->images()->upload(
+    itemId: 668423,
+    uploadImageData: $base64,
+    uploadFileName: 'product.png',
+    fileType: 'png',
+    position: 0,
+);
+$imageId = $response->json('id');
+```
+
+> **Note:** PlentyONE processes images asynchronously. Right after upload, `width`, `height`, and `size` may still be `0`. The metadata is populated after a few seconds.
+
+## Need More?
+
+This SDK currently covers variations and images. If you need additional endpoints, feel free to fork the repository or submit a pull request.
+
+## License
+
+MIT
