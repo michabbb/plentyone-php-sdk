@@ -3,3 +3,6 @@ composer.lock
 test*.php
 .idea/
 .phpunit.cache/
+AGENTS.md
+CLAUDE.md
+cache/

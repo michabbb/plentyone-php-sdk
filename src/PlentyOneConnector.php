@@ -6,6 +6,7 @@ namespace PlentyOne;
 
 use PlentyOne\Auth\PlentyOneAuthenticator;
 use PlentyOne\Requests\Auth\LoginRequest;
+use PlentyOne\Resources\CategoriesResource;
 use PlentyOne\Resources\ImagesResource;
 use PlentyOne\Resources\VariationsResource;
 use Saloon\Http\Connector;
@@ -68,5 +69,10 @@ class PlentyOneConnector extends Connector
     public function images(): ImagesResource
     {
         return new ImagesResource($this);
+    }
+
+    public function categories(): CategoriesResource
+    {
+        return new CategoriesResource($this);
     }
 }

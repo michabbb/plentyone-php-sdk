@@ -17,6 +17,9 @@ class GetVariationsRequest extends Request
         private readonly ?bool $isActive = null,
         private readonly ?int $page = null,
         private readonly ?int $itemsPerPage = null,
+        private readonly ?int $categoryId = null,
+        private readonly ?bool $isMain = null,
+        private readonly ?string $with = null,
     ) {}
 
     public function resolveEndpoint(): string
@@ -32,6 +35,9 @@ class GetVariationsRequest extends Request
             'isActive' => $this->isActive,
             'page' => $this->page,
             'itemsPerPage' => $this->itemsPerPage,
+            'categoryId' => $this->categoryId,
+            'isMain' => $this->isMain,
+            'with' => $this->with,
         ], fn ($value) => $value !== null);
     }
 }

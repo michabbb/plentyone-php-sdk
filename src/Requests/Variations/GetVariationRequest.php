@@ -14,10 +14,18 @@ class GetVariationRequest extends Request
     public function __construct(
         private readonly int $itemId,
         private readonly int $variationId,
+        private readonly ?string $with = null,
     ) {}
 
     public function resolveEndpoint(): string
     {
         return '/items/' . $this->itemId . '/variations/' . $this->variationId;
+    }
+
+    protected function defaultQuery(): array
+    {
+        return array_filter([
+            'with' => $this->with,
+        ], fn ($value) => $value !== null);
     }
 }
