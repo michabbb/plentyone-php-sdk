@@ -47,10 +47,13 @@ $connector->login('username', 'password');
 | Method | Description | API Endpoint |
 |--------|-------------|-------------|
 | `variations()->find(string $numberExact)` | Find variation by SKU | `GET /rest/items/variations?numberExact=...` |
-| `variations()->get(int $itemId, int $variationId)` | Get a specific variation | `GET /rest/items/{id}/variations/{varId}` |
+| `variations()->get(int $itemId, int $variationId, ?string $with)` | Get a specific variation | `GET /rest/items/{id}/variations/{varId}` |
 | `variations()->list(array $filters)` | List variations with filters | `GET /rest/items/variations` |
+| `variations()->documents(int $itemId, int $variationId)` | Get file-type properties (documents) | `GET /rest/items/{id}/variations/{varId}` |
+| `variations()->addDocument(int $itemId, int $variationId, int $propertyId, string $fileUrl)` | Add or update a document | `POST/PUT /rest/properties/relations` |
+| `variations()->removeDocument(int $itemId, int $variationId, int $propertyId)` | Remove a document | `DELETE /rest/properties/relations/{id}` |
 
-**Available filters for `list()`:** `numberExact`, `id`, `isActive`, `page`, `itemsPerPage`
+**Available filters for `list()`:** `numberExact`, `id`, `isActive`, `page`, `itemsPerPage`, `categoryId`, `isMain`, `with`
 
 ### Images
 
@@ -94,9 +97,41 @@ $imageId = $response->json('id');
 
 > **Note:** PlentyONE processes images asynchronously. Right after upload, `width`, `height`, and `size` may still be `0`. The metadata is populated after a few seconds.
 
+### Categories
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `categories()->list(array $filters)` | List categories with filters | `GET /rest/categories` |
+
+**Available filters for `list()`:** `type`, `with`, `page`, `itemsPerPage`, `parentId`, `lang`, `name`, `level`, `plentyId`, `linklist`, `updatedAt`, `tagId`, `metaKeywords`
+
+### Documents (File-Properties)
+
+Documents (manuals, data sheets, etc.) are stored as properties with `cast: "file"` on variations.
+
+```php
+// Get all documents for a variation
+$docs = $connector->variations()->documents($itemId, $variationId);
+
+// Add a document (creates property link if it doesn't exist)
+$connector->variations()->addDocument(
+    itemId: 668423,
+    variationId: 19408,
+    propertyId: 498, // e.g. 498 = manual
+    fileUrl: 'https://example.com/manual.pdf',
+);
+
+// Remove a document
+$connector->variations()->removeDocument(
+    itemId: 668423,
+    variationId: 19408,
+    propertyId: 498,
+);
+```
+
 ## Need More?
 
-This SDK currently covers variations and images. If you need additional endpoints, feel free to fork the repository or submit a pull request.
+This SDK currently covers variations, images, categories, and document properties. If you need additional endpoints, feel free to fork the repository or submit a pull request.
 
 ## License
 
