@@ -8,7 +8,9 @@ use PlentyOne\Auth\PlentyOneAuthenticator;
 use PlentyOne\Requests\Auth\LoginRequest;
 use PlentyOne\Resources\CategoriesResource;
 use PlentyOne\Resources\ImagesResource;
+use PlentyOne\Resources\ReferrersResource;
 use PlentyOne\Resources\VariationsResource;
+use PlentyOne\Resources\WebstoresResource;
 use Saloon\Http\Connector;
 use Saloon\Http\PendingRequest;
 use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
@@ -74,5 +76,15 @@ class PlentyOneConnector extends Connector
     public function categories(): CategoriesResource
     {
         return new CategoriesResource($this);
+    }
+
+    public function webstores(): WebstoresResource
+    {
+        return new WebstoresResource($this);
+    }
+
+    public function referrers(): ReferrersResource
+    {
+        return new ReferrersResource($this);
     }
 }

@@ -105,6 +105,34 @@ $imageId = $response->json('id');
 
 **Available filters for `list()`:** `type`, `with`, `page`, `itemsPerPage`, `parentId`, `lang`, `name`, `level`, `plentyId`, `linklist`, `updatedAt`, `tagId`, `metaKeywords`
 
+### Webstores
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `webstores()->list()` | List all webstores/clients with PlentyID and name | `GET /rest/webstores` |
+
+```php
+$webstores = $connector->webstores()->list()->json();
+
+foreach ($webstores as $ws) {
+    echo $ws['storeIdentifier'] . ': ' . $ws['name'] . "\n";
+}
+```
+
+### Order Referrers (Sales Channels)
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `referrers()->list()` | List all order referrers/sales channels with ID and name | `GET /rest/orders/referrers` |
+
+```php
+$referrers = $connector->referrers()->list()->json();
+
+foreach ($referrers as $r) {
+    echo $r['id'] . ': ' . ($r['backendName'] ?? $r['name']) . "\n";
+}
+```
+
 ### Documents (File-Properties)
 
 Documents (manuals, data sheets, etc.) are stored as properties with `cast: "file"` on variations.
@@ -131,7 +159,7 @@ $connector->variations()->removeDocument(
 
 ## Need More?
 
-This SDK currently covers variations, images, categories, and document properties. If you need additional endpoints, feel free to fork the repository or submit a pull request.
+This SDK currently covers variations, images, categories, webstores, order referrers, and document properties. If you need additional endpoints, feel free to fork the repository or submit a pull request.
 
 ## License
 
