@@ -133,6 +133,23 @@ foreach ($referrers as $r) {
 }
 ```
 
+### Properties
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `properties()->list(?int $page, ?int $itemsPerPage, ?string $with)` | List all properties (paginated) | `GET /rest/properties` |
+| `properties()->groups(?int $page, ?int $itemsPerPage, ?string $with)` | List all property groups (paginated) | `GET /rest/properties/groups` |
+
+```php
+// List all properties with names
+$response = $connector->properties()->list(page: 1, itemsPerPage: 100, with: 'names');
+$properties = $response->json()['entries'];
+
+// List all property groups
+$response = $connector->properties()->groups(page: 1, itemsPerPage: 100, with: 'names');
+$groups = $response->json()['entries'];
+```
+
 ### Documents (File-Properties)
 
 Documents (manuals, data sheets, etc.) are stored as properties with `cast: "file"` on variations.
@@ -159,7 +176,7 @@ $connector->variations()->removeDocument(
 
 ## Need More?
 
-This SDK currently covers variations, images, categories, webstores, order referrers, and document properties. If you need additional endpoints, feel free to fork the repository or submit a pull request.
+This SDK currently covers variations, images, categories, properties, webstores, order referrers, and document properties. If you need additional endpoints, feel free to fork the repository or submit a pull request.
 
 ## License
 

@@ -8,6 +8,7 @@ use PlentyOne\Auth\PlentyOneAuthenticator;
 use PlentyOne\Requests\Auth\LoginRequest;
 use PlentyOne\Resources\CategoriesResource;
 use PlentyOne\Resources\ImagesResource;
+use PlentyOne\Resources\PropertiesResource;
 use PlentyOne\Resources\ReferrersResource;
 use PlentyOne\Resources\VariationsResource;
 use PlentyOne\Resources\WebstoresResource;
@@ -76,6 +77,11 @@ class PlentyOneConnector extends Connector
     public function categories(): CategoriesResource
     {
         return new CategoriesResource($this);
+    }
+
+    public function properties(): PropertiesResource
+    {
+        return new PropertiesResource($this);
     }
 
     public function webstores(): WebstoresResource
