@@ -6,6 +6,7 @@ namespace PlentyOne;
 
 use PlentyOne\Auth\PlentyOneAuthenticator;
 use PlentyOne\Requests\Auth\LoginRequest;
+use PlentyOne\Resources\CatalogsResource;
 use PlentyOne\Resources\CategoriesResource;
 use PlentyOne\Resources\ImagesResource;
 use PlentyOne\Resources\PropertiesResource;
@@ -92,5 +93,10 @@ class PlentyOneConnector extends Connector
     public function referrers(): ReferrersResource
     {
         return new ReferrersResource($this);
+    }
+
+    public function catalogs(): CatalogsResource
+    {
+        return new CatalogsResource($this);
     }
 }
