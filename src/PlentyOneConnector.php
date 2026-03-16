@@ -12,6 +12,7 @@ use PlentyOne\Resources\ImagesResource;
 use PlentyOne\Resources\PropertiesResource;
 use PlentyOne\Resources\ReferrersResource;
 use PlentyOne\Resources\VariationsResource;
+use PlentyOne\Resources\TagsResource;
 use PlentyOne\Resources\WebstoresResource;
 use Saloon\Http\Connector;
 use Saloon\Http\PendingRequest;
@@ -98,5 +99,10 @@ class PlentyOneConnector extends Connector
     public function catalogs(): CatalogsResource
     {
         return new CatalogsResource($this);
+    }
+
+    public function tags(): TagsResource
+    {
+        return new TagsResource($this);
     }
 }
