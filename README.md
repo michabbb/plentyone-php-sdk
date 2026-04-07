@@ -1,6 +1,6 @@
 # PlentyOne PHP SDK
 
-A lightweight PHP SDK for the [PlentyONE REST API](https://developers.plentymarkets.com), built on [Saloon PHP v3](https://docs.saloon.dev).
+A lightweight PHP SDK for the [PlentyONE REST API](https://developers.plentymarkets.com), built on [Saloon PHP v4](https://docs.saloon.dev).
 
 ## Requirements
 
