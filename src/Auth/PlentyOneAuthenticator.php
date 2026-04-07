@@ -11,8 +11,8 @@ use Saloon\Http\PendingRequest;
 class PlentyOneAuthenticator implements Authenticator
 {
     public function __construct(
-        public readonly string $accessToken,
-        public readonly string $refreshToken,
+        public readonly string            $accessToken,
+        public readonly string            $refreshToken,
         public readonly DateTimeImmutable $expiresAt,
     ) {}
 
@@ -26,6 +26,9 @@ class PlentyOneAuthenticator implements Authenticator
         return new DateTimeImmutable() >= $this->expiresAt;
     }
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public static function fromLoginResponse(array $data): self
     {
         return new self(

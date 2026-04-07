@@ -16,9 +16,9 @@ class CreateTagRelationshipRequest extends Request implements HasBody
     protected Method $method = Method::POST;
 
     public function __construct(
-        private readonly int $tagId,
+        private readonly int    $tagId,
         private readonly string $tagType,
-        private readonly int $relationshipValue,
+        private readonly int    $relationshipValue,
     ) {}
 
     public function resolveEndpoint(): string
@@ -26,11 +26,14 @@ class CreateTagRelationshipRequest extends Request implements HasBody
         return '/tags/relationships';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return [
-            'tagId' => $this->tagId,
-            'tagType' => $this->tagType,
+            'tagId'             => $this->tagId,
+            'tagType'           => $this->tagType,
             'relationshipValue' => $this->relationshipValue,
         ];
     }

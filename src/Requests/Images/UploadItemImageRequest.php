@@ -16,15 +16,15 @@ class UploadItemImageRequest extends Request implements HasBody
     protected Method $method = Method::POST;
 
     public function __construct(
-        private readonly int $itemId,
+        private readonly int     $itemId,
         private readonly ?string $uploadUrl = null,
         private readonly ?string $uploadImageData = null,
         private readonly ?string $uploadFileName = null,
         private readonly ?string $fileType = null,
-        private readonly int $position = 0,
+        private readonly int     $position = 0,
         private readonly ?string $name = null,
         private readonly ?string $alternate = null,
-        private readonly string $lang = 'de',
+        private readonly string  $lang = 'de',
     ) {}
 
     public function resolveEndpoint(): string
@@ -32,6 +32,9 @@ class UploadItemImageRequest extends Request implements HasBody
         return '/items/' . $this->itemId . '/images/upload';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         $body = [
@@ -44,7 +47,7 @@ class UploadItemImageRequest extends Request implements HasBody
 
         if ($this->uploadImageData !== null) {
             $body['uploadImageData'] = $this->uploadImageData;
-            $body['uploadFileName'] = $this->uploadFileName ?? 'image.jpg';
+            $body['uploadFileName']  = $this->uploadFileName ?? 'image.jpg';
             if ($this->fileType !== null) {
                 $body['fileType'] = $this->fileType;
             }
@@ -53,8 +56,8 @@ class UploadItemImageRequest extends Request implements HasBody
         if ($this->name !== null || $this->alternate !== null) {
             $body['names'] = [
                 [
-                    'lang' => $this->lang,
-                    'name' => $this->name ?? '',
+                    'lang'      => $this->lang,
+                    'name'      => $this->name ?? '',
                     'alternate' => $this->alternate ?? '',
                 ],
             ];

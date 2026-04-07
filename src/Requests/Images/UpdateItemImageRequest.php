@@ -16,8 +16,8 @@ class UpdateItemImageRequest extends Request implements HasBody
     protected Method $method = Method::PUT;
 
     public function __construct(
-        private readonly int $itemId,
-        private readonly int $imageId,
+        private readonly int  $itemId,
+        private readonly int  $imageId,
         private readonly ?int $position = null,
     ) {}
 
@@ -26,6 +26,9 @@ class UpdateItemImageRequest extends Request implements HasBody
         return '/items/' . $this->itemId . '/images/' . $this->imageId;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return array_filter([

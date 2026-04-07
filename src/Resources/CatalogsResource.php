@@ -9,10 +9,10 @@ use PlentyOne\Requests\Catalogs\GetCatalogPreviewRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogPrivateUrlRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogPublicUrlRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogRequest;
+use PlentyOne\Requests\Catalogs\GetCatalogsRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogTemplatesRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogVersionRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogVersionsRequest;
-use PlentyOne\Requests\Catalogs\GetCatalogsRequest;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 

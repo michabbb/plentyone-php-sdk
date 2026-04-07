@@ -7,17 +7,20 @@ namespace PlentyOne\Data;
 class Variation
 {
     public function __construct(
-        public readonly int $id,
-        public readonly int $itemId,
-        public readonly string $number,
+        public readonly int     $id,
+        public readonly int     $itemId,
+        public readonly string  $number,
         public readonly ?string $name,
-        public readonly bool $isActive,
-        public readonly ?float $weightG,
-        public readonly ?float $widthMM,
-        public readonly ?float $lengthMM,
-        public readonly ?float $heightMM,
+        public readonly bool    $isActive,
+        public readonly ?float  $weightG,
+        public readonly ?float  $widthMM,
+        public readonly ?float  $lengthMM,
+        public readonly ?float  $heightMM,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(

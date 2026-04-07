@@ -16,8 +16,8 @@ class CreatePropertyRelationRequest extends Request implements HasBody
     protected Method $method = Method::POST;
 
     public function __construct(
-        private readonly int $propertyId,
-        private readonly int $relationTargetId,
+        private readonly int    $propertyId,
+        private readonly int    $relationTargetId,
         private readonly string $fileUrl,
         private readonly string $lang = 'de',
     ) {}
@@ -27,16 +27,19 @@ class CreatePropertyRelationRequest extends Request implements HasBody
         return '/properties/relations';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return [
-            'propertyId' => $this->propertyId,
+            'propertyId'             => $this->propertyId,
             'relationTypeIdentifier' => 'item',
-            'relationTargetId' => $this->relationTargetId,
-            'relationValues' => [
+            'relationTargetId'       => $this->relationTargetId,
+            'relationValues'         => [
                 [
                     'value' => $this->fileUrl,
-                    'lang' => $this->lang,
+                    'lang'  => $this->lang,
                 ],
             ],
         ];

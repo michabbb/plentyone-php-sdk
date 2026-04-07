@@ -26,6 +26,9 @@ class LinkVariationImageRequest extends Request implements HasBody
         return '/items/' . $this->itemId . '/variations/' . $this->variationId . '/variation_images';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return [

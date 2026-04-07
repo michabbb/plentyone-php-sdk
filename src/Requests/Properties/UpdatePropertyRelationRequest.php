@@ -16,7 +16,7 @@ class UpdatePropertyRelationRequest extends Request implements HasBody
     protected Method $method = Method::PUT;
 
     public function __construct(
-        private readonly int $relationId,
+        private readonly int    $relationId,
         private readonly string $fileUrl,
         private readonly string $lang = 'de',
     ) {}
@@ -26,13 +26,16 @@ class UpdatePropertyRelationRequest extends Request implements HasBody
         return '/properties/relations/' . $this->relationId;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return [
             'relationValues' => [
                 [
                     'value' => $this->fileUrl,
-                    'lang' => $this->lang,
+                    'lang'  => $this->lang,
                 ],
             ],
         ];

@@ -12,9 +12,9 @@ class DeleteTagRelationshipRequest extends Request
     protected Method $method = Method::DELETE;
 
     public function __construct(
-        private readonly int $tagId,
+        private readonly int    $tagId,
         private readonly string $tagType,
-        private readonly int $relationshipValue,
+        private readonly int    $relationshipValue,
     ) {}
 
     public function resolveEndpoint(): string
@@ -25,8 +25,8 @@ class DeleteTagRelationshipRequest extends Request
     protected function defaultQuery(): array
     {
         return [
-            'tagId' => $this->tagId,
-            'tagType' => $this->tagType,
+            'tagId'             => $this->tagId,
+            'tagType'           => $this->tagType,
             'relationshipValue' => $this->relationshipValue,
         ];
     }

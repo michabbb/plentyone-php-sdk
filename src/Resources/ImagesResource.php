@@ -27,17 +27,24 @@ class ImagesResource extends BaseResource
     }
 
     public function upload(
-        int $itemId,
+        int     $itemId,
         ?string $uploadUrl = null,
         ?string $uploadImageData = null,
         ?string $uploadFileName = null,
         ?string $fileType = null,
-        int $position = 0,
+        int     $position = 0,
         ?string $name = null,
         ?string $alternate = null,
     ): Response {
         return $this->connector->send(new UploadItemImageRequest(
-            $itemId, $uploadUrl, $uploadImageData, $uploadFileName, $fileType, $position, $name, $alternate,
+            $itemId,
+            $uploadUrl,
+            $uploadImageData,
+            $uploadFileName,
+            $fileType,
+            $position,
+            $name,
+            $alternate,
         ));
     }
 

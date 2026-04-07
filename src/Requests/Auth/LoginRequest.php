@@ -25,6 +25,9 @@ class LoginRequest extends Request implements HasBody
         return '/login';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return [

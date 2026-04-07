@@ -12,8 +12,8 @@ class GetTagsRequest extends Request
     protected Method $method = Method::GET;
 
     public function __construct(
-        private readonly ?int $page = null,
-        private readonly ?int $itemsPerPage = null,
+        private readonly ?int    $page = null,
+        private readonly ?int    $itemsPerPage = null,
         private readonly ?string $with = null,
     ) {}
 
@@ -25,9 +25,9 @@ class GetTagsRequest extends Request
     protected function defaultQuery(): array
     {
         return array_filter([
-            'page' => $this->page,
+            'page'         => $this->page,
             'itemsPerPage' => $this->itemsPerPage,
-            'with' => $this->with,
+            'with'         => $this->with,
         ], fn ($value) => $value !== null);
     }
 }

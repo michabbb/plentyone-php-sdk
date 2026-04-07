@@ -12,8 +12,8 @@ class GetVariationRequest extends Request
     protected Method $method = Method::GET;
 
     public function __construct(
-        private readonly int $itemId,
-        private readonly int $variationId,
+        private readonly int     $itemId,
+        private readonly int     $variationId,
         private readonly ?string $with = null,
     ) {}
 

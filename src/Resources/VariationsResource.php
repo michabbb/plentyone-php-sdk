@@ -22,11 +22,13 @@ class VariationsResource extends BaseResource
     /**
      * Dokumente (File-Properties) einer Variation laden.
      * Gibt nur Properties vom Typ "file" zurück.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public function documents(int $itemId, int $variationId): array
     {
-        $response = $this->get($itemId, $variationId, 'properties,variationProperties');
-        $data = $response->json();
+        $response   = $this->get($itemId, $variationId, 'properties,variationProperties');
+        $data       = $response->json();
         $properties = $data['properties'] ?? [];
 
         return array_values(array_filter($properties, function (array $prop) {
@@ -78,6 +80,9 @@ class VariationsResource extends BaseResource
         return $this->connector->send(new GetVariationsRequest(numberExact: $numberExact));
     }
 
+    /**
+     * @param  array<string, mixed>  $filters
+     */
     public function list(array $filters = []): Response
     {
         return $this->connector->send(new GetVariationsRequest(...$filters));
