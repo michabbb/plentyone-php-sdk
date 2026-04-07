@@ -22,5 +22,11 @@
         "psr-4": {
             "PlentyOne\\Tests\\": "tests/"
         }
+    },
+    "require-dev": {
+        "rector/rector": "^2.4",
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "phpstan/phpstan": "^2.1",
+        "erickskrauch/php-cs-fixer-custom-fixers": "^1.3"
     }
 }

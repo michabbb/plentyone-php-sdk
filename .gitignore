@@ -3,6 +3,11 @@ composer.lock
 test*.php
 .idea/
 .phpunit.cache/
+.phpstan.cache/
+.php-cs-fixer.cache
+.gitignore~
+.claude/
 AGENTS.md
 CLAUDE.md
 cache/
+memory/
