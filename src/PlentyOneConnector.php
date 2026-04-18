@@ -7,6 +7,7 @@ namespace PlentyOne;
 use PlentyOne\Auth\PlentyOneAuthenticator;
 use PlentyOne\Requests\Auth\LoginRequest;
 use PlentyOne\Resources\AccountsResource;
+use PlentyOne\Resources\CatalogStatusesResource;
 use PlentyOne\Resources\CatalogsResource;
 use PlentyOne\Resources\CategoriesResource;
 use PlentyOne\Resources\ImagesResource;
@@ -112,6 +113,11 @@ class PlentyOneConnector extends Connector
     public function catalogs(): CatalogsResource
     {
         return new CatalogsResource($this);
+    }
+
+    public function catalogStatuses(): CatalogStatusesResource
+    {
+        return new CatalogStatusesResource($this);
     }
 
     public function shipping(): ShippingResource

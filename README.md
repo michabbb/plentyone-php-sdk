@@ -262,15 +262,43 @@ $groups   = $response->json('entries');
 
 | Method | Description | API Endpoint |
 |--------|-------------|-------------|
-| `catalogs()->list()` | List all catalogs | `GET /rest/catalogs` |
-| `catalogs()->get(string $id)` | Get a single catalog | `GET /rest/catalogs/{id}` |
-| `catalogs()->preview(string $id)` | Preview catalog data | `GET /rest/catalogs/{id}/preview` |
-| `catalogs()->publicUrl(string $id)` | Get the public download URL | `GET /rest/catalogs/{id}/public-url` |
-| `catalogs()->privateUrl(string $id)` | Get the private download URL | `GET /rest/catalogs/{id}/private-url` |
-| `catalogs()->export(string $id)` | Trigger an export run | `POST /rest/catalogs/{id}/export` |
-| `catalogs()->versions(string $id)` | List all versions of a catalog | `GET /rest/catalogs/{id}/versions` |
-| `catalogs()->version(string $id, string $versionId)` | Get a specific catalog version | `GET /rest/catalogs/{id}/versions/{versionId}` |
+| `catalogs()->list()` | List all catalogs | `GET /rest/catalogs/catalogs` |
+| `catalogs()->create(array $body)` | Create a catalog | `POST /rest/catalogs/catalogs` |
+| `catalogs()->copy(array $body)` | Copy one or more catalogs | `PUT /rest/catalogs/catalogs/copy` |
+| `catalogs()->copyFormat(string $catalogId, array $body)` | Copy a catalog format | `PUT /rest/catalogs/catalogs/{catalogId}/copy` |
+| `catalogs()->import(array $body)` | Import a catalog | `POST /rest/catalogs/catalogs/import` |
+| `catalogs()->migrate()` | Migrate catalogs from Dynamo DB to S3 | `POST /rest/catalogs/catalogs/migrate` |
+| `catalogs()->activate(string $id, bool $active = true)` | Activate or deactivate a catalog | `POST /rest/catalogs/catalogs/activate/{id}` |
+| `catalogs()->archive()` | List archived (deleted) catalogs | `GET /rest/catalogs/catalogs/archive` |
+| `catalogs()->restore(string $id)` | Restore an archived catalog | `POST /rest/catalogs/catalogs/archive/{id}/restore` |
+| `catalogs()->get(string $id)` | Get a single catalog | `GET /rest/catalogs/catalogs/{id}` |
+| `catalogs()->delete(string $id)` | Delete a catalog | `DELETE /rest/catalogs/catalogs/{id}` |
+| `catalogs()->update(string $id, array $body)` | Update a catalog | `PUT /rest/catalogs/catalogs/{id}` |
+| `catalogs()->content(string $id)` | Get catalog content | `GET /rest/catalogs/catalogs/{id}/content` |
+| `catalogs()->updateContent(string $id, array $body)` | Update catalog content | `PUT /rest/catalogs/catalogs/{id}/content` |
+| `catalogs()->preview(string $id)` | Preview catalog data | `GET /rest/catalogs/catalogs/{id}/preview` |
+| `catalogs()->previewVdi(string $id, int $variationId)` | Preview VDI catalog export | `POST /rest/catalogs/catalogs/{id}/preview/vdi` |
+| `catalogs()->publicUrl(string $id)` | Get the public download URL | `GET /rest/catalogs/catalogs/{id}/url/public` |
+| `catalogs()->privateUrl(string $id)` | Get the private download URL | `GET /rest/catalogs/catalogs/{id}/url/private` |
+| `catalogs()->export(string $id)` | Get catalog export configuration | `GET /rest/catalogs/catalogs/{id}/export` |
+| `catalogs()->versions(string $id)` | List all versions of a catalog | `GET /rest/catalogs/catalogs/{id}/versions` |
+| `catalogs()->version(string $id, string $versionId)` | Get a specific catalog version | `GET /rest/catalogs/catalogs/{id}/versions/{versionId}` |
 | `catalogs()->templates()` | List all catalog templates | `GET /rest/catalogs/templates` |
+| `catalogs()->scheduleDays()` | List available schedule days | `GET /rest/catalogs/catalogs/schedule/days` |
+| `catalogs()->token()` | Generate an alphanumeric token | `GET /rest/catalogs/catalogs/token` |
+| `catalogs()->checkConnection(string $protocol, array $body = [])` | Check FTP/FTPS/SFTP connection | `POST /rest/catalogs/connection/check/{protocol}` |
+
+### Catalog Statuses
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `catalogStatuses()->list(?string $catalogId, ?int $page, ?int $itemsPerPage)` | List all catalog statuses (optional filter by catalogId) | `GET /rest/catalogs/statuses` |
+| `catalogStatuses()->get(int $id)` | Get a specific catalog status | `GET /rest/catalogs/statuses/{id}` |
+| `catalogStatuses()->data(int $id)` | Get status data | `GET /rest/catalogs/statuses/{id}/data` |
+| `catalogStatuses()->logs(int $id)` | List status logs | `GET /rest/catalogs/statuses/{id}/logs` |
+| `catalogStatuses()->histories(int $id)` | List status histories | `GET /rest/catalogs/statuses/{id}/histories` |
+| `catalogStatuses()->historyFile(int $id, string $filename)` | Get a single status history file | `GET /rest/catalogs/statuses/{id}/histories/{filename}` |
+| `catalogStatuses()->cancel(int $statusId)` | Cancel an export run | `POST /rest/catalogs/statuses/{statusId}/cancel` |
 
 ### Documents (File-Properties)
 
