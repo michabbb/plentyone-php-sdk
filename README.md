@@ -178,7 +178,9 @@ foreach ($variation['variationSuppliers'] as $sup) {
 |--------|-------------|-------------|
 | `stock()->list(?int $variationId, ?string $updatedAtFrom, ...)` | List stock with filters | `GET /rest/stockmanagement/stock` |
 | `stock()->forVariation(int $variationId)` | Convenience: stock entries for one variation | `GET /rest/stockmanagement/stock?variationId=...` |
-| `stock()->warehouses()` | List all warehouses (id, name, type, …) | `GET /rest/stockmanagement/warehouses` |
+| `stock()->warehouses(?array $with)` | List all warehouses (id, name, typeId, …). Pass `with: ['repairWarehouse']` to load the repair-warehouse relation. | `GET /rest/stockmanagement/warehouses` |
+| `stock()->redistribute(array $redistributions)` | Rebook ("umbuchen") stock between warehouses / storage locations | `PUT /rest/stockmanagement/stock/redistribute` |
+| `stock()->moveBetweenWarehouses(int $variationId, int $currentWarehouseId, int $newWarehouseId, int $quantity, ...)` | Convenience: move a single variation quantity between two warehouses | `PUT /rest/stockmanagement/stock/redistribute` |
 
 ```php
 // Net stock for one variation across all warehouses
@@ -200,6 +202,32 @@ foreach ($entries as $e) {
     }
 }
 ```
+
+#### Redistribute (rebook stock between warehouses)
+
+`redistribute()` moves stock from one warehouse/storage location to another – the total
+stock stays the same, only the location changes. For batch-managed or BBD/MHD variations,
+`batch` / `bestBeforeDate` must be included in the redistribution object.
+
+```php
+// Move 2 units of a variation from warehouse 106 to warehouse 122
+$connector->stock()->moveBetweenWarehouses(
+    variationId: 3686,
+    currentWarehouseId: 106,
+    newWarehouseId: 122,
+    quantity: 2,
+    reasonId: 101, // movement reason (Bewegungsgrund), if required by your config
+);
+
+// Or several redistributions in one call
+$connector->stock()->redistribute([
+    ['variationId' => 3686, 'reasonId' => 101, 'quantity' => 2, 'currentWarehouseId' => 106, 'newWarehouseId' => 122],
+    ['variationId' => 3686, 'reasonId' => 101, 'quantity' => 1, 'currentWarehouseId' => 125, 'newWarehouseId' => 122],
+]);
+```
+
+> **Note:** This is a writing call. It actually moves stock in PlentyONE – test against a
+> sandbox / with a safe `reasonId` before using it in production.
 
 ### Shipping
 
