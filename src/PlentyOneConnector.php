@@ -13,6 +13,7 @@ use PlentyOne\Resources\CategoriesResource;
 use PlentyOne\Resources\ImagesResource;
 use PlentyOne\Resources\ItemsResource;
 use PlentyOne\Resources\ManufacturersResource;
+use PlentyOne\Resources\OrdersResource;
 use PlentyOne\Resources\PropertiesResource;
 use PlentyOne\Resources\ReferrersResource;
 use PlentyOne\Resources\ShippingResource;
@@ -143,5 +144,10 @@ class PlentyOneConnector extends Connector
     public function stock(): StockResource
     {
         return new StockResource($this);
+    }
+
+    public function orders(): OrdersResource
+    {
+        return new OrdersResource($this);
     }
 }

@@ -263,6 +263,56 @@ foreach ($referrers as $r) {
 }
 ```
 
+### Orders
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `orders()->search(array $filters)` | Search orders with filters (paginated) | `GET /rest/orders/search` |
+| `orders()->get(int $orderId, ?array $with)` | Get a single order by ID | `GET /rest/orders/{orderId}` |
+| `orders()->statuses(?string $lang, ?int $page, ?int $itemsPerPage)` | List the configured order statuses (id + names, paginated) | `GET /rest/orders/statuses` |
+
+**Common filters for `search()`:** `orderId`, `plentyId`, `orderTypeId`, `statusId`, `referrerId`, `ownerId`, `locationId`, `createdAt`, `updatedAt`, `contactData`, `itemVariationId`, `variationNumber`, `documentNumber`, `tag`, `shippingStatus`, `sortBy`, `sortOrder`, `page`, `itemsPerPage`, `with`, `lazyLoaded`, `withDeleted`. Dynamic filters: `orderProperty_{typeId}`, `orderDate_{typeId}`, `documentNumber_{documentType}`, `addressRelation_{typeId}`, `relationReference_{referenceType}_{relationType}`.
+
+**Order type IDs:** 1 = sales order, 2 = delivery, 3 = returns, 4 = credit note, 5 = warranty, 6 = repair, 7 = offer, 8 = advance order, 9 = multi-order, 10 = multi credit note, 11 = multi delivery, 12 = reorder, 13 = partial delivery.
+
+> **Important:** The search loads **no relations by default** (`lazyLoaded = true`). To get `properties`, `orderItems`, `addresses` etc. you must request them via `with: [...]` (or set `lazyLoaded => false`).
+
+```php
+// Find the Plenty order for an Amazon order number.
+// The Amazon order id is stored as order property type 7 ("External order ID").
+$resp = $connector->orders()->search([
+    'orderProperty_7' => '123-1234567-1234567',
+    'with'            => ['orderItems', 'addresses', 'properties'],
+]);
+$order = $resp->json('entries.0');
+
+// Latest orders of a sales channel (referrerId 4.01 = Amazon Germany)
+$latest = $connector->orders()->search([
+    'referrerId'   => '4.01',
+    'sortBy'       => 'orderId',
+    'sortOrder'    => 'desc',
+    'itemsPerPage' => 20,
+    'with'         => ['properties'],
+])->json('entries');
+
+// Single order with relations
+$order = $connector->orders()->get(12345, ['orderItems', 'addresses', 'relations'])->json();
+
+// Configured order statuses (paginated). Statuses are NOT a fixed enum —
+// they are configured per system, so resolve names from the instance.
+$statuses = [];
+$page = 1;
+do {
+    $resp = $connector->orders()->statuses('de', $page, 100);
+    foreach ($resp->json('entries') as $s) {
+        $statuses[(string) $s['statusId']] = $s['names']['de'] ?? null;
+    }
+    $isLast = $resp->json('isLastPage');
+    $page++;
+} while (! $isLast);
+// $statuses now maps each configured statusId to its name, e.g. $statuses['7']
+```
+
 ### Properties
 
 | Method | Description | API Endpoint |
