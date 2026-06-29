@@ -34,9 +34,9 @@ use Saloon\Http\Response;
 
 class CatalogsResource extends BaseResource
 {
-    public function list(): Response
+    public function list(?int $page = null, ?int $itemsPerPage = null): Response
     {
-        return $this->connector->send(new GetCatalogsRequest());
+        return $this->connector->send(new GetCatalogsRequest($page, $itemsPerPage));
     }
 
     public function create(array $body = []): Response
