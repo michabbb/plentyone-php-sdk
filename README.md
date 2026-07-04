@@ -187,18 +187,18 @@ foreach ($variation['variationSuppliers'] as $sup) {
 $entries  = $connector->stock()->forVariation(35747)->json('entries');
 $netTotal = array_sum(array_column($entries, 'netStock'));
 
-// Find the "Leverkusen" warehouse and get its net stock
-$warehouses   = $connector->stock()->warehouses()->json();
-$leverkusenId = null;
+// Find a warehouse by name and get its net stock
+$warehouses  = $connector->stock()->warehouses()->json();
+$warehouseId = null;
 foreach ($warehouses as $wh) {
-    if (stripos($wh['name'], 'Leverkusen') !== false) {
-        $leverkusenId = $wh['id'];
+    if (stripos($wh['name'], 'Main Warehouse') !== false) {
+        $warehouseId = $wh['id'];
         break;
     }
 }
 foreach ($entries as $e) {
-    if ($e['warehouseId'] === $leverkusenId) {
-        echo "Leverkusen netto: {$e['netStock']}\n";
+    if ($e['warehouseId'] === $warehouseId) {
+        echo "Net stock: {$e['netStock']}\n";
     }
 }
 ```
@@ -270,6 +270,8 @@ foreach ($referrers as $r) {
 | `orders()->search(array $filters)` | Search orders with filters (paginated) | `GET /rest/orders/search` |
 | `orders()->get(int $orderId, ?array $with)` | Get a single order by ID | `GET /rest/orders/{orderId}` |
 | `orders()->statuses(?string $lang, ?int $page, ?int $itemsPerPage)` | List the configured order statuses (id + names, paginated) | `GET /rest/orders/statuses` |
+| `orders()->update(int $orderId, array $body)` | Update an order (send only changed fields) | `PUT /rest/orders/{orderId}` |
+| `orders()->setStatus(int $orderId, int\|float\|string $statusId)` | Convenience: change an order's status | `PUT /rest/orders/{orderId}` |
 
 **Common filters for `search()`:** `orderId`, `plentyId`, `orderTypeId`, `statusId`, `referrerId`, `ownerId`, `locationId`, `createdAt`, `updatedAt`, `contactData`, `itemVariationId`, `variationNumber`, `documentNumber`, `tag`, `shippingStatus`, `sortBy`, `sortOrder`, `page`, `itemsPerPage`, `with`, `lazyLoaded`, `withDeleted`. Dynamic filters: `orderProperty_{typeId}`, `orderDate_{typeId}`, `documentNumber_{documentType}`, `addressRelation_{typeId}`, `relationReference_{referenceType}_{relationType}`.
 
@@ -311,7 +313,18 @@ do {
     $page++;
 } while (! $isLast);
 // $statuses now maps each configured statusId to its name, e.g. $statuses['7']
+
+// Change an order's status (writing call — mutates the order in PlentyONE).
+// Pass the exact configured statusId (sub-statuses are decimal, e.g. 8.01 !== 8.1).
+$connector->orders()->setStatus(12345, 7);
+
+// Or update several order fields at once.
+$connector->orders()->update(12345, ['statusId' => 7]);
 ```
+
+> **Note:** `update()` / `setStatus()` are **writing** calls that change real data in
+> PlentyONE. Test against a non-critical order first. Order statuses are configured per
+> system — resolve the target `statusId` via `orders()->statuses()`.
 
 ### Properties
 

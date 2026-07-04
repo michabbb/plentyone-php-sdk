@@ -7,6 +7,7 @@ namespace PlentyOne\Resources;
 use PlentyOne\Requests\Orders\GetOrderRequest;
 use PlentyOne\Requests\Orders\GetOrderStatusesRequest;
 use PlentyOne\Requests\Orders\SearchOrdersRequest;
+use PlentyOne\Requests\Orders\UpdateOrderRequest;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 
@@ -60,5 +61,34 @@ class OrdersResource extends BaseResource
     public function statuses(?string $lang = null, ?int $page = null, ?int $itemsPerPage = null): Response
     {
         return $this->connector->send(new GetOrderStatusesRequest($lang, $page, $itemsPerPage));
+    }
+
+    /**
+     * Update an order — send only the fields to change (e.g. ['statusId' => 7]).
+     *
+     * PUT /rest/orders/{orderId}
+     *
+     * ⚠️ WRITING call — this mutates the order in PlentyONE.
+     *
+     * @param  array<string,mixed>  $body  Fields to update.
+     */
+    public function update(int $orderId, array $body): Response
+    {
+        return $this->connector->send(new UpdateOrderRequest($orderId, $body));
+    }
+
+    /**
+     * Convenience: change the status of an order.
+     *
+     * Pass the exact configured `statusId`. Sub-statuses are decimal (e.g. 8.01),
+     * and 8.01 !== 8.1 — use the precise value from `statuses()`.
+     *
+     * ⚠️ WRITING call — this mutates the order in PlentyONE.
+     *
+     * @param  int|float|string  $statusId  Target status id (e.g. 7 or 8.01).
+     */
+    public function setStatus(int $orderId, int|float|string $statusId): Response
+    {
+        return $this->update($orderId, ['statusId' => $statusId]);
     }
 }
