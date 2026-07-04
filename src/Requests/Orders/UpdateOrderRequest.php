@@ -28,11 +28,11 @@ class UpdateOrderRequest extends Request implements HasBody
     protected Method $method = Method::PUT;
 
     /**
-     * @param  array<string,mixed>  $body  Fields to update (e.g. ['statusId' => 7]).
+     * @param  array<string,mixed>  $payload  Fields to update (e.g. ['statusId' => 7]).
      */
     public function __construct(
         private readonly int   $orderId,
-        private readonly array $body,
+        private readonly array $payload,
     ) {
     }
 
@@ -46,6 +46,6 @@ class UpdateOrderRequest extends Request implements HasBody
      */
     protected function defaultBody(): array
     {
-        return array_filter($this->body, static fn ($value) => $value !== null);
+        return array_filter($this->payload, static fn ($value) => $value !== null);
     }
 }
