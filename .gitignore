@@ -4,6 +4,7 @@ test*.php
 .idea/
 .phpunit.cache/
 .phpstan.cache/
+.rector-cache/
 .php-cs-fixer.cache
 .gitignore~
 .claude/
