@@ -5,30 +5,30 @@ declare(strict_types=1);
 namespace PlentyOne\Resources;
 
 use PlentyOne\Requests\Catalogs\ActivateCatalogRequest;
+use PlentyOne\Requests\Catalogs\CheckCatalogConnectionRequest;
 use PlentyOne\Requests\Catalogs\CopyCatalogFormatRequest;
 use PlentyOne\Requests\Catalogs\CopyCatalogRequest;
 use PlentyOne\Requests\Catalogs\CreateCatalogRequest;
-use PlentyOne\Requests\Catalogs\CheckCatalogConnectionRequest;
 use PlentyOne\Requests\Catalogs\DeleteCatalogRequest;
-use PlentyOne\Requests\Catalogs\UpdateCatalogRequest;
-use PlentyOne\Requests\Catalogs\UpdateCatalogContentRequest;
 use PlentyOne\Requests\Catalogs\ExportCatalogRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogArchiveRequest;
-use PlentyOne\Requests\Catalogs\ImportCatalogRequest;
-use PlentyOne\Requests\Catalogs\MigrateCatalogRequest;
-use PlentyOne\Requests\Catalogs\RestoreCatalogRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogContentRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogPreviewRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogPreviewVdiRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogPrivateUrlRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogPublicUrlRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogRequest;
-use PlentyOne\Requests\Catalogs\GetCatalogsRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogScheduleDaysRequest;
-use PlentyOne\Requests\Catalogs\GetCatalogTokenRequest;
+use PlentyOne\Requests\Catalogs\GetCatalogsRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogTemplatesRequest;
+use PlentyOne\Requests\Catalogs\GetCatalogTokenRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogVersionRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogVersionsRequest;
+use PlentyOne\Requests\Catalogs\ImportCatalogRequest;
+use PlentyOne\Requests\Catalogs\MigrateCatalogRequest;
+use PlentyOne\Requests\Catalogs\RestoreCatalogRequest;
+use PlentyOne\Requests\Catalogs\UpdateCatalogContentRequest;
+use PlentyOne\Requests\Catalogs\UpdateCatalogRequest;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 
@@ -39,21 +39,33 @@ class CatalogsResource extends BaseResource
         return $this->connector->send(new GetCatalogsRequest($page, $itemsPerPage));
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public function create(array $body = []): Response
     {
         return $this->connector->send(new CreateCatalogRequest($body));
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public function copy(array $body = []): Response
     {
         return $this->connector->send(new CopyCatalogRequest($body));
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public function copyFormat(string $catalogId, array $body = []): Response
     {
         return $this->connector->send(new CopyCatalogFormatRequest($catalogId, $body));
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public function import(array $body = []): Response
     {
         return $this->connector->send(new ImportCatalogRequest($body));
@@ -89,6 +101,9 @@ class CatalogsResource extends BaseResource
         return $this->connector->send(new DeleteCatalogRequest($id));
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public function update(string $id, array $body = []): Response
     {
         return $this->connector->send(new UpdateCatalogRequest($id, $body));
@@ -109,6 +124,9 @@ class CatalogsResource extends BaseResource
         return $this->connector->send(new GetCatalogContentRequest($id));
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public function updateContent(string $id, array $body = []): Response
     {
         return $this->connector->send(new UpdateCatalogContentRequest($id, $body));
@@ -154,6 +172,9 @@ class CatalogsResource extends BaseResource
         return $this->connector->send(new GetCatalogTokenRequest());
     }
 
+    /**
+     * @param array<string, mixed> $body
+     */
     public function checkConnection(string $protocol, array $body = []): Response
     {
         return $this->connector->send(new CheckCatalogConnectionRequest($protocol, $body));

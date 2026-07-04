@@ -15,6 +15,9 @@ class ImportCatalogRequest extends Request implements HasBody
 
     protected Method $method = Method::POST;
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(
         private readonly array $data = [],
     ) {}
@@ -24,6 +27,9 @@ class ImportCatalogRequest extends Request implements HasBody
         return '/catalogs/catalogs/import';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data;

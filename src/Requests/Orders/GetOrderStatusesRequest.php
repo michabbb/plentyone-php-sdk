@@ -23,8 +23,8 @@ class GetOrderStatusesRequest extends Request
 
     public function __construct(
         private readonly ?string $lang = null,
-        private readonly ?int $page = null,
-        private readonly ?int $itemsPerPage = null,
+        private readonly ?int    $page = null,
+        private readonly ?int    $itemsPerPage = null,
     ) {
     }
 

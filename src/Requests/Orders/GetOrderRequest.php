@@ -22,7 +22,7 @@ class GetOrderRequest extends Request
      * @param  array<int,string>|null  $with  Relations to load (e.g. ['addresses','orderItems.variation','documents','comments']).
      */
     public function __construct(
-        private readonly int $orderId,
+        private readonly int    $orderId,
         private readonly ?array $with = null,
     ) {
     }

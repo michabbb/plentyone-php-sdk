@@ -15,9 +15,12 @@ class CopyCatalogFormatRequest extends Request implements HasBody
 
     protected Method $method = Method::PUT;
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(
         private readonly string $catalogId,
-        private readonly array $data = [],
+        private readonly array  $data = [],
     ) {}
 
     public function resolveEndpoint(): string
@@ -25,6 +28,9 @@ class CopyCatalogFormatRequest extends Request implements HasBody
         return '/catalogs/catalogs/' . $this->catalogId . '/copy';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data;

@@ -6,11 +6,11 @@ namespace PlentyOne\Resources;
 
 use PlentyOne\Requests\Catalogs\CancelCatalogStatusRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogStatusDataRequest;
+use PlentyOne\Requests\Catalogs\GetCatalogStatusesRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogStatusHistoriesRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogStatusHistoryFileRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogStatusLogsRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogStatusRequest;
-use PlentyOne\Requests\Catalogs\GetCatalogStatusesRequest;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 

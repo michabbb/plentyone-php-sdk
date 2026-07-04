@@ -15,9 +15,12 @@ class CheckCatalogConnectionRequest extends Request implements HasBody
 
     protected Method $method = Method::POST;
 
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(
         private readonly string $protocol,
-        private readonly array $data = [],
+        private readonly array  $data = [],
     ) {}
 
     public function resolveEndpoint(): string
@@ -25,6 +28,9 @@ class CheckCatalogConnectionRequest extends Request implements HasBody
         return '/catalogs/connection/check/' . $this->protocol;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return $this->data;

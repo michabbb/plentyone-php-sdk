@@ -12,7 +12,7 @@ class GetCatalogStatusHistoryFileRequest extends Request
     protected Method $method = Method::GET;
 
     public function __construct(
-        private readonly int $id,
+        private readonly int    $id,
         private readonly string $filename,
     ) {}
 

@@ -17,7 +17,7 @@ class GetCatalogPreviewVdiRequest extends Request implements HasBody
 
     public function __construct(
         private readonly string $id,
-        private readonly int $variationId,
+        private readonly int    $variationId,
     ) {}
 
     public function resolveEndpoint(): string
@@ -25,6 +25,9 @@ class GetCatalogPreviewVdiRequest extends Request implements HasBody
         return '/catalogs/catalogs/' . $this->id . '/preview/vdi';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return ['variationId' => $this->variationId];

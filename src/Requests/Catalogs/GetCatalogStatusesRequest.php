@@ -13,8 +13,8 @@ class GetCatalogStatusesRequest extends Request
 
     public function __construct(
         private readonly ?string $catalogId = null,
-        private readonly ?int $page = null,
-        private readonly ?int $itemsPerPage = null,
+        private readonly ?int    $page = null,
+        private readonly ?int    $itemsPerPage = null,
     ) {}
 
     public function resolveEndpoint(): string
@@ -25,9 +25,9 @@ class GetCatalogStatusesRequest extends Request
     protected function defaultQuery(): array
     {
         return array_filter([
-            'catalogId' => $this->catalogId,
-            'page' => $this->page,
+            'catalogId'    => $this->catalogId,
+            'page'         => $this->page,
             'itemsPerPage' => $this->itemsPerPage,
-        ], fn($value) => $value !== null);
+        ], fn ($value) => $value !== null);
     }
 }

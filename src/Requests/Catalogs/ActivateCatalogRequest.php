@@ -17,7 +17,7 @@ class ActivateCatalogRequest extends Request implements HasBody
 
     public function __construct(
         private readonly string $id,
-        private readonly bool $active = true,
+        private readonly bool   $active = true,
     ) {}
 
     public function resolveEndpoint(): string
@@ -25,6 +25,9 @@ class ActivateCatalogRequest extends Request implements HasBody
         return '/catalogs/catalogs/activate/' . $this->id;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultBody(): array
     {
         return ['active' => $this->active];
