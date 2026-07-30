@@ -331,7 +331,13 @@ $connector->orders()->update(12345, ['statusId' => 7]);
 | Method | Description | API Endpoint |
 |--------|-------------|-------------|
 | `properties()->list(?int $page, ?int $itemsPerPage, ?string $with)` | List all properties (paginated) | `GET /rest/properties` |
+| `properties()->get(int $propertyId)` | Get one property | `GET /rest/properties/{propertyId}` |
+| `properties()->create(array $payload)` | Create a property (writing call) | `POST /rest/properties` |
+| `properties()->delete(int $propertyId)` | Delete a property (writing call) | `DELETE /rest/properties/{propertyId}` |
 | `properties()->groups(?int $page, ?int $itemsPerPage, ?string $with)` | List all property groups (paginated) | `GET /rest/properties/groups` |
+| `properties()->group(int $groupId, ?string $with)` | Get one property group | `GET /rest/properties/groups/{groupId}` |
+| `properties()->attachToGroup(int $groupId, int $propertyId)` | Attach a property to a group (writing call) | `POST /rest/properties/groups/{groupId}/properties/{propertyId}` |
+| `properties()->attachManyToGroups(array $relations)` | Bulk-attach properties to groups (writing call) | `PUT /rest/v2/properties/groups/relations` |
 
 ```php
 $response   = $connector->properties()->list(page: 1, itemsPerPage: 100, with: 'names');
@@ -339,7 +345,29 @@ $properties = $response->json('entries');
 
 $response = $connector->properties()->groups(page: 1, itemsPerPage: 100, with: 'names');
 $groups   = $response->json('entries');
+
+// Create a property. `position` is accepted by the API although it is absent
+// from some endpoint descriptions.
+$property = $connector->properties()->create([
+    'names'          => [['lang' => 'en', 'name' => 'Range']],
+    'typeIdentifier' => 'item',
+    'cast'           => 'int',
+    'position'       => 160,
+]);
+
+// Assign the new property to a group.
+$connector->properties()->attachToGroup(42, $property->json('id'));
+
+// Assign multiple existing properties to groups in one request.
+$connector->properties()->attachManyToGroups([
+    ['propertyId' => 123, 'groupId' => 42],
+    ['propertyId' => 456, 'groupId' => 42],
+]);
 ```
+
+> **Note:** `create()`, `attachToGroup()` and `attachManyToGroups()` are **writing**
+> calls that permanently change PlentyONE master data. Verify the payload in a dry run
+> before applying it.
 
 ### Tags
 
