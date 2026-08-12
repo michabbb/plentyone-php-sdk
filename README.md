@@ -374,8 +374,13 @@ $connector->properties()->attachManyToGroups([
 | Method | Description | API Endpoint |
 |--------|-------------|-------------|
 | `tags()->list(?int $page, ?int $itemsPerPage, ?string $with)` | List all tags | `GET /rest/tags` |
+| `tags()->relationships(int $tagId, string $type, ?int $page, ?int $itemsPerPage)` | List relationships of a tag (paginated) | `GET /rest/v2/tags/relationships` |
 | `tags()->link(int $tagId, string $tagType, int $relationshipValue)` | Link a tag to a variation/item | `POST /rest/tags/relationships` |
 | `tags()->unlink(int $tagId, string $tagType, int $relationshipValue)` | Unlink a tag from a variation/item | `DELETE /rest/tags/relationships` |
+
+Tag relationships are paginated. For `type: 'variation'`, each
+`entries[].value` contains a variation ID. Iterate pages until `isLastPage` is
+`true` and compare the collected relationship count with `totalsCount`.
 
 ### Catalogs
 
