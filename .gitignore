@@ -3,6 +3,7 @@ composer.lock
 test*.php
 .idea/
 .phpunit.cache/
+.phpunit.result.cache
 .phpstan.cache/
 .rector-cache/
 .php-cs-fixer.cache

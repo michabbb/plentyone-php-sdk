@@ -21,13 +21,18 @@ use PlentyOne\Resources\StockResource;
 use PlentyOne\Resources\TagsResource;
 use PlentyOne\Resources\VariationsResource;
 use PlentyOne\Resources\WebstoresResource;
+use Saloon\Exceptions\Request\FatalRequestException;
+use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Connector;
 use Saloon\Http\PendingRequest;
+use Saloon\Http\Request;
 use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
 
 class PlentyOneConnector extends Connector
 {
     use AlwaysThrowOnErrors;
+
+    public ?int $tries = 2;
 
     private ?string $username = null;
 
@@ -61,6 +66,7 @@ class PlentyOneConnector extends Connector
 
         if ($this->tokenAuth?->hasExpired() && $this->username && $this->password) {
             $this->login($this->username, $this->password);
+            $pendingRequest->authenticate($this->tokenAuth);
         }
     }
 
@@ -74,6 +80,29 @@ class PlentyOneConnector extends Connector
         $this->authenticate($this->tokenAuth);
 
         return $this;
+    }
+
+    public function handleRetry(FatalRequestException|RequestException $exception, Request $request): bool
+    {
+        if ($request instanceof LoginRequest) {
+            return false;
+        }
+
+        if (!$exception instanceof RequestException) {
+            return false;
+        }
+
+        if (401 !== $exception->getResponse()->status()) {
+            return false;
+        }
+
+        if (null === $this->username || null === $this->password) {
+            return false;
+        }
+
+        $this->login($this->username, $this->password);
+
+        return true;
     }
 
     public function variations(): VariationsResource
