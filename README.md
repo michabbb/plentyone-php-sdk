@@ -267,11 +267,39 @@ foreach ($referrers as $r) {
 
 | Method | Description | API Endpoint |
 |--------|-------------|-------------|
+| `orders()->list(array $filters)` | List orders, supports date-range filters | `GET /rest/orders` |
 | `orders()->search(array $filters)` | Search orders with filters (paginated) | `GET /rest/orders/search` |
 | `orders()->get(int $orderId, ?array $with)` | Get a single order by ID | `GET /rest/orders/{orderId}` |
 | `orders()->statuses(?string $lang, ?int $page, ?int $itemsPerPage)` | List the configured order statuses (id + names, paginated) | `GET /rest/orders/statuses` |
 | `orders()->update(int $orderId, array $body)` | Update an order (send only changed fields) | `PUT /rest/orders/{orderId}` |
 | `orders()->setStatus(int $orderId, int\|float\|string $statusId)` | Convenience: change an order's status | `PUT /rest/orders/{orderId}` |
+
+> **`list()` vs. `search()` — pick the right one:** `search()` filters `createdAt` /
+> `updatedAt` for **equality only**, `list()` is the only order endpoint that understands
+> **date ranges**. Use `list()` for backfills and incremental syncs, `search()` for
+> everything the list endpoint cannot filter (see the table below).
+
+**Filters for `list()`** (all verified against a live system): `createdAtFrom`, `createdAtTo`,
+`updatedAtFrom`, `updatedAtTo`, `page`, `itemsPerPage`, `with`.
+
+| | `list()` — `GET /rest/orders` | `search()` — `GET /rest/orders/search` |
+|---|---|---|
+| Date ranges (`createdAtFrom`/`To`, `updatedAtFrom`/`To`) | ✅ | ❌ (`createdAt` matches exactly; `…From`/`…To` fail or are ignored) |
+| `orderTypeId`, `withDeleted` | ❌ silently ignored (HTTP 200, unchanged count) | ✅ |
+| Dynamic filters (`orderProperty_{typeId}`, …) | ❌ | ✅ |
+| max `itemsPerPage` | 250 | 250 |
+| Pagination cap `page * itemsPerPage` | 60,000 | 60,000 |
+
+Details for `list()`:
+
+* Dates must be **W3C including timezone** (`2026-08-17T00:00:00+02:00`). Without a timezone
+  the API answers HTTP 422 (`Error parsing date string. String must be in W3C format.`).
+* Both range bounds are **inclusive** — consecutive slices may return a boundary order
+  twice, but never drop one.
+* `itemsPerPage` above 250 → HTTP 422 (`The number of items per page exceeds the maximum of 250.`).
+* `page * itemsPerPage` above 60,000 → HTTP 422. To read more than 60,000 orders, split the
+  query into smaller time slices. The SDK stays a thin wrapper and does **not** paginate,
+  retry or throttle for you.
 
 **Common filters for `search()`:** `orderId`, `plentyId`, `orderTypeId`, `statusId`, `referrerId`, `ownerId`, `locationId`, `createdAt`, `updatedAt`, `contactData`, `itemVariationId`, `variationNumber`, `documentNumber`, `tag`, `shippingStatus`, `sortBy`, `sortOrder`, `page`, `itemsPerPage`, `with`, `lazyLoaded`, `withDeleted`. Dynamic filters: `orderProperty_{typeId}`, `orderDate_{typeId}`, `documentNumber_{documentType}`, `addressRelation_{typeId}`, `relationReference_{referenceType}_{relationType}`.
 
@@ -280,6 +308,35 @@ foreach ($referrers as $r) {
 > **Important:** The search loads **no relations by default** (`lazyLoaded = true`). To get `properties`, `orderItems`, `addresses` etc. you must request them via `with: [...]` (or set `lazyLoaded => false`).
 
 ```php
+// All orders of a time span, including their items and amounts.
+// list() is the only order endpoint that can do ranges - search() cannot.
+$resp = $connector->orders()->list([
+    'createdAtFrom' => '2026-08-17T00:00:00+02:00',
+    'createdAtTo'   => '2026-08-19T00:00:00+02:00',
+    'itemsPerPage'  => 250,
+    'with'          => ['orderItems.amounts'],
+]);
+$orders = $resp->json('entries');
+
+// Incremental sync: everything that CHANGED in the time span - this also catches
+// cancellations and returns booked onto older orders.
+$page = 1;
+do {
+    $resp = $connector->orders()->list([
+        'updatedAtFrom' => '2026-08-18T00:00:00+02:00',
+        'updatedAtTo'   => '2026-08-19T00:00:00+02:00',
+        'itemsPerPage'  => 250,
+        'page'          => $page,
+        'with'          => ['orderItems.amounts'],
+    ]);
+    foreach ($resp->json('entries') as $order) {
+        // ... process $order
+    }
+    $page++;
+} while (! $resp->json('isLastPage'));
+// Mind the cap: page * itemsPerPage must stay below 60,000. For bigger result sets,
+// cut the range into smaller slices (e.g. per day or per month).
+
 // Find the Plenty order for an Amazon order number.
 // The Amazon order id is stored as order property type 7 ("External order ID").
 $resp = $connector->orders()->search([

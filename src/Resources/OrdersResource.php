@@ -6,6 +6,7 @@ namespace PlentyOne\Resources;
 
 use PlentyOne\Requests\Orders\GetOrderRequest;
 use PlentyOne\Requests\Orders\GetOrderStatusesRequest;
+use PlentyOne\Requests\Orders\ListOrdersRequest;
 use PlentyOne\Requests\Orders\SearchOrdersRequest;
 use PlentyOne\Requests\Orders\UpdateOrderRequest;
 use Saloon\Http\BaseResource;
@@ -13,6 +14,41 @@ use Saloon\Http\Response;
 
 class OrdersResource extends BaseResource
 {
+    /**
+     * List orders (paginated) — the only order endpoint that supports date *ranges*.
+     *
+     * GET /rest/orders
+     *
+     * Prefer this over `search()` whenever orders have to be selected by a time span:
+     * `search()` filters `createdAt` / `updatedAt` for **equality only**, `list()` can do
+     * ranges. Use `createdAtFrom`/`createdAtTo` for a backfill and `updatedAtFrom`/
+     * `updatedAtTo` for incremental syncs, so that later changes to old orders
+     * (cancellations, returns) are picked up.
+     *
+     * Verified filters: `createdAtFrom`, `createdAtTo`, `updatedAtFrom`, `updatedAtTo`
+     * (all W3C date/time **including** timezone, e.g. `2026-08-17T00:00:00+02:00` — a date
+     * without timezone is rejected with HTTP 422), `page`, `itemsPerPage` (default 50,
+     * **maximum 250**) and `with` (array, e.g. `['orderItems.amounts']`).
+     *
+     * Both range bounds are **inclusive**, so consecutive slices may return a boundary
+     * order twice, but never drop one.
+     *
+     * Pagination cap: `page * itemsPerPage` must not exceed **60,000** (HTTP 422 beyond
+     * that) — the same cap as `search()`. Larger result sets have to be split into smaller
+     * time slices by the caller; the SDK does not enforce or work around this.
+     *
+     * `orderTypeId` and `withDeleted` are **silently ignored** by this endpoint (HTTP 200,
+     * unchanged result count). Use `search()` for those, or filter `typeId` client-side.
+     *
+     * @param  array<string,mixed>  $filters
+     *
+     * @see https://developers.plentymarkets.com/en-gb/developers/main/rest-api-guides/order-data.html
+     */
+    public function list(array $filters = []): Response
+    {
+        return $this->connector->send(new ListOrdersRequest($filters));
+    }
+
     /**
      * Search orders with filters (paginated).
      *
