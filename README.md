@@ -271,6 +271,7 @@ foreach ($referrers as $r) {
 | `orders()->search(array $filters)` | Search orders with filters (paginated) | `GET /rest/orders/search` |
 | `orders()->get(int $orderId, ?array $with)` | Get a single order by ID | `GET /rest/orders/{orderId}` |
 | `orders()->statuses(?string $lang, ?int $page, ?int $itemsPerPage)` | List the configured order statuses (id + names, paginated) | `GET /rest/orders/statuses` |
+| `orders()->itemTransactions(int $orderId, ?int $page, ?int $itemsPerPage)` | List item stock transactions for one order (paginated) | `GET /rest/orders/items/transactions` |
 | `orders()->update(int $orderId, array $body)` | Update an order (send only changed fields) | `PUT /rest/orders/{orderId}` |
 | `orders()->setStatus(int $orderId, int\|float\|string $statusId)` | Convenience: change an order's status | `PUT /rest/orders/{orderId}` |
 
@@ -371,6 +372,12 @@ do {
 } while (! $isLast);
 // $statuses now maps each configured statusId to its name, e.g. $statuses['7']
 
+// Stock transactions belonging to the items of one order.
+$transactions = $connector->orders()->itemTransactions(12345, page: 1, itemsPerPage: 250);
+foreach ($transactions->json('entries') as $transaction) {
+    // Each entry links back through orderItemId.
+}
+
 // Change an order's status (writing call — mutates the order in PlentyONE).
 // Pass the exact configured statusId (sub-statuses are decimal, e.g. 8.01 !== 8.1).
 $connector->orders()->setStatus(12345, 7);
@@ -382,6 +389,24 @@ $connector->orders()->update(12345, ['statusId' => 7]);
 > **Note:** `update()` / `setStatus()` are **writing** calls that change real data in
 > PlentyONE. Test against a non-critical order first. Order statuses are configured per
 > system — resolve the target `statusId` via `orders()->statuses()`.
+
+`itemTransactions()` deliberately accepts exactly one scalar order ID. PlentyONE
+returns HTTP 200 while silently ignoring an array of order IDs and the tested
+`createdAt...` / `updatedAt...` range filters. Use the pagination envelope and do
+not infer that an unsupported filter worked merely because the response was successful.
+
+### Reorders
+
+| Method | Description | API Endpoint |
+|--------|-------------|-------------|
+| `reorders()->deliveryDate(int $orderId)` | Get the calculated delivery date of a reorder | `GET /rest/reorders/{orderId}/delivery_date` |
+
+```php
+$deliveryDate = $connector->reorders()->deliveryDate(12345)->json('deliveryDate');
+```
+
+The endpoint returns PlentyONE's calculated delivery date. It is not necessarily
+the same value as order date type 11 stored on the reorder.
 
 ### Properties
 

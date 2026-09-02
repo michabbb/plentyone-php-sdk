@@ -16,6 +16,7 @@ use PlentyOne\Resources\ManufacturersResource;
 use PlentyOne\Resources\OrdersResource;
 use PlentyOne\Resources\PropertiesResource;
 use PlentyOne\Resources\ReferrersResource;
+use PlentyOne\Resources\ReordersResource;
 use PlentyOne\Resources\ShippingResource;
 use PlentyOne\Resources\StockResource;
 use PlentyOne\Resources\TagsResource;
@@ -178,5 +179,10 @@ class PlentyOneConnector extends Connector
     public function orders(): OrdersResource
     {
         return new OrdersResource($this);
+    }
+
+    public function reorders(): ReordersResource
+    {
+        return new ReordersResource($this);
     }
 }

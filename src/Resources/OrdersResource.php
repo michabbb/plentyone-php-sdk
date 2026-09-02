@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PlentyOne\Resources;
 
+use PlentyOne\Requests\Orders\GetOrderItemTransactionsRequest;
 use PlentyOne\Requests\Orders\GetOrderRequest;
 use PlentyOne\Requests\Orders\GetOrderStatusesRequest;
 use PlentyOne\Requests\Orders\ListOrdersRequest;
@@ -97,6 +98,20 @@ class OrdersResource extends BaseResource
     public function statuses(?string $lang = null, ?int $page = null, ?int $itemsPerPage = null): Response
     {
         return $this->connector->send(new GetOrderStatusesRequest($lang, $page, $itemsPerPage));
+    }
+
+    /**
+     * List stock transactions for the items of one order (paginated).
+     *
+     * GET /rest/orders/items/transactions
+     *
+     * Only scalar `orderId`, `page`, and `itemsPerPage` parameters are supported.
+     * PlentyONE silently ignores multi-order arrays and the tested date-range
+     * filters while returning HTTP 200.
+     */
+    public function itemTransactions(int $orderId, ?int $page = null, ?int $itemsPerPage = null): Response
+    {
+        return $this->connector->send(new GetOrderItemTransactionsRequest($orderId, $page, $itemsPerPage));
     }
 
     /**
