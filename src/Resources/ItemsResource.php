@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace PlentyOne\Resources;
 
+use PlentyOne\Requests\Items\GetItemDescriptionRequest;
 use PlentyOne\Requests\Items\GetItemRequest;
 use PlentyOne\Requests\Items\GetItemsRequest;
+use PlentyOne\Requests\Items\UpdateItemDescriptionRequest;
 use Saloon\Http\BaseResource;
 use Saloon\Http\Response;
 
@@ -17,6 +19,22 @@ class ItemsResource extends BaseResource
     public function get(int $itemId, ?string $with = null, ?string $lang = null): Response
     {
         return $this->connector->send(new GetItemRequest($itemId, $with, $lang));
+    }
+
+    public function getDescription(int $itemId, int $variationId, string $lang = 'de'): Response
+    {
+        return $this->connector->send(new GetItemDescriptionRequest($itemId, $variationId, $lang));
+    }
+
+    public function updateDescription(
+        int    $itemId,
+        int    $variationId,
+        string $description,
+        string $lang = 'de',
+    ): Response {
+        return $this->connector->send(
+            new UpdateItemDescriptionRequest($itemId, $variationId, $description, $lang),
+        );
     }
 
     /**

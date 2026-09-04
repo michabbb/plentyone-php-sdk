@@ -51,6 +51,8 @@ The SDK exposes resources via the connector. Each resource returns a Saloon `Res
 | Method | Description | API Endpoint |
 |--------|-------------|-------------|
 | `items()->get(int $itemId, ?string $with, ?string $lang)` | Get a single item (incl. texts) | `GET /rest/items/{id}` |
+| `items()->getDescription(int $itemId, int $variationId, string $lang)` | Get the item description in one language | `GET /rest/items/{id}/variations/{varId}/descriptions/{lang}` |
+| `items()->updateDescription(int $itemId, int $variationId, string $description, string $lang)` | Update only the long description in one language | `PUT /rest/items/{id}/variations/{varId}/descriptions/{lang}` |
 | `items()->list(...)` | List items with filters | `GET /rest/items` |
 
 **Available filters for `list()`:** `id`, `name`, `manufacturerId`, `flagOne`, `flagTwo`, `page`, `itemsPerPage`, `with`, `lang`, `updatedBetween`, `variationUpdatedBetween`, `variationRelatedUpdatedBetween`, `or`
@@ -62,6 +64,27 @@ $name = $item['texts'][0]['name1'] ?? null;
 
 // Items by manufacturer
 $items = $connector->items()->list(manufacturerId: '1', itemsPerPage: 50)->json();
+```
+
+PlentyONE stores this value in `texts[].description` on the item. However, the dedicated
+description endpoint requires the item's main variation ID for addressing. Only `description` is
+sent in the update body; the other item and text fields are not included.
+
+```php
+$itemId = 12345;
+$mainVariationId = 67890;
+$lang = 'de';
+
+$description = $connector->items()
+    ->getDescription($itemId, $mainVariationId, $lang)
+    ->json('description');
+
+$connector->items()->updateDescription(
+    $itemId,
+    $mainVariationId,
+    '<p>The new long description</p>',
+    $lang,
+);
 ```
 
 ### Variations
