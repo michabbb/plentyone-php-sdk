@@ -422,14 +422,110 @@ not infer that an unsupported filter worked merely because the response was succ
 
 | Method | Description | API Endpoint |
 |--------|-------------|-------------|
+| `reorders()->create(array $payload)` | Create header and items; requires explicit statusId and enforces typeId 12 | `POST /rest/reorders` |
+| `reorders()->update(int $orderId, array $payload)` | Update header or items | `PUT /rest/reorders/{orderId}` |
+| `tags()->link(int $tagId, 'order', int $orderId)` | Attach a tag to the created reorder | `POST /rest/tags/relationships` |
+| `reorders()->get(int $orderId, ?array $with = null)` | Get a type-12 order with its items and related data | `GET /rest/orders/{orderId}` |
+| `reorders()->search(array $filters = [])` | Search type-12 orders with related data (paginated) | `GET /rest/orders/search` |
 | `reorders()->deliveryDate(int $orderId)` | Get the calculated delivery date of a reorder | `GET /rest/reorders/{orderId}/delivery_date` |
 
 ```php
+$reorder = $connector->reorders()->get(1497905)->json();
+$items = $reorder['orderItems'];
+// Each item includes its name, variation, quantity, amounts (prices/discounts),
+// properties, dates, references and stock transactions.
+
+$response = $connector->reorders()->search([
+    'statusId'     => 19.1,
+    'page'         => 1,
+    'itemsPerPage' => 50,
+]);
+$reorders = $response->json('entries');
+
+// Optional: replace the default relations for a smaller response.
+$reorder = $connector->reorders()->get(1497905, ['orderItems.amounts'])->json();
+
 $deliveryDate = $connector->reorders()->deliveryDate(12345)->json('deliveryDate');
 ```
 
-The endpoint returns PlentyONE's calculated delivery date. It is not necessarily
+`get()` and `search()` reuse the order endpoints, as documented in the
+[purchase-order guide](https://developers.plentymarkets.com/en-gb/developers/main/rest-api-guides/purchase-orders.html).
+Their default `with` includes order amounts/VATs, dates, properties, references,
+addresses, supplier contact, receiving warehouse, accounting location, payment
+terms/payments, tags, comments, document metadata, shipping packages/pallets, and
+all items with amounts, properties/order properties, dates, references, variation
+data, barcodes, transactions, comments and serial numbers. The API response is
+returned unchanged, including fields not explicitly known to the SDK.
+
+This loads the related order data, not document file contents, the Flow Tracker,
+mail history or every nested product-master relation. Pass an explicit `with`
+array to select other supported relations; `[]` requests only API defaults.
+`get()` throws `UnexpectedValueException` if the ID belongs to a different order
+type. `search()` always enforces `orderTypeId = 12`, even if a different value is
+passed, and returns one page; use `entries`, `isLastPage` and `lastPageNumber` to
+read further pages. The order-search filter limitations above still apply.
+
+`deliveryDate()` returns PlentyONE's calculated delivery date. It is not necessarily
 the same value as order date type 11 stored on the reorder.
+
+Create a reorder with header, supplier, receiving warehouse and items in one call,
+then attach a tag (replace the example IDs with your own):
+
+```php
+$created = $connector->reorders()->create([
+    'statusId' => 19, // Santos: open. 19.1 starts the supplier-order Flow.
+    'plentyId' => $plentyId,
+    'ownerId' => $ownerId,
+    'referrerId' => 0,
+    'relations' => [
+        ['referenceType' => 'contact', 'referenceId' => $supplierId, 'relation' => 'sender'],
+        ['referenceType' => 'warehouse', 'referenceId' => $warehouseId, 'relation' => 'receiver'],
+    ],
+    'dates' => [
+        ['typeId' => 7, 'date' => '2026-11-02T00:00:00+01:00'], // Payment due date
+        ['typeId' => 11, 'date' => '2026-10-15T00:00:00+02:00'], // Delivery date
+    ],
+    'properties' => [['typeId' => 6, 'value' => 'de']], // Document language
+    'orderItems' => [[
+        'typeId' => 1,
+        'itemVariationId' => $variationId, // Internal variation ID, not variation number
+        'quantity' => 2,
+        'orderItemName' => 'Example item',
+        'properties' => [['typeId' => 21, 'value' => '1']],
+        'dates' => [['typeId' => 11, 'date' => '2026-10-15T00:00:00+02:00']],
+        'amounts' => [[
+            'currency' => 'EUR',
+            'exchangeRate' => 1,
+            'priceOriginalGross' => 12.64,
+            'surcharge' => 0,
+            'discount' => 0,
+            'isPercentage' => true,
+        ]],
+    ]],
+])->json();
+
+$orderId = (int) $created['id']; // Persist this ID before the separate tag call.
+$connector->tags()->link(227, 'order', $orderId);
+$reorder = $connector->reorders()->get($orderId)->json();
+
+// Optional: change a delivery date later.
+$connector->reorders()->update($orderId, [
+    'dates' => [['typeId' => 11, 'date' => '2026-10-20T00:00:00+02:00']],
+]);
+```
+
+`create()` requires a non-null `statusId` and always sends `typeId = 12`.
+Status IDs depend on your PlentyONE configuration; 19 is Santos' open status.
+Both methods pass the nested payload through, including all supplied items,
+prices, discounts, currency/exchange rate, dates and properties. Further field
+validation is performed by PlentyONE. For item updates, include the existing
+order-item `id`. Do not copy response-only IDs, documents or stock transactions
+from an existing reorder into a creation payload.
+
+The example keeps status 19 and omits purchase date type 16. Setting that date
+or changing the status can initiate ordering; these methods do not add either
+automatically. Tag linking is a separate write: if it fails, the reorder still
+exists. Resume using the saved order ID instead of creating it again.
 
 ### Properties
 
