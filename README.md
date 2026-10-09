@@ -606,12 +606,46 @@ Tag relationships are paginated. For `type: 'variation'`, each
 | `catalogs()->publicUrl(string $id)` | Get the public download URL | `GET /rest/catalogs/catalogs/{id}/url/public` |
 | `catalogs()->privateUrl(string $id)` | Get the private download URL | `GET /rest/catalogs/catalogs/{id}/url/private` |
 | `catalogs()->export(string $id)` | Get catalog export configuration | `GET /rest/catalogs/catalogs/{id}/export` |
+| `catalogs()->initiateExport(string $id)` | Start catalog data generation (V1) | `POST /rest/catalogs/export/{id}/initiate` |
 | `catalogs()->versions(string $id)` | List all versions of a catalog | `GET /rest/catalogs/catalogs/{id}/versions` |
 | `catalogs()->version(string $id, string $versionId)` | Get a specific catalog version | `GET /rest/catalogs/catalogs/{id}/versions/{versionId}` |
 | `catalogs()->templates()` | List all catalog templates | `GET /rest/catalogs/templates` |
 | `catalogs()->scheduleDays()` | List available schedule days | `GET /rest/catalogs/catalogs/schedule/days` |
 | `catalogs()->token()` | Generate an alphanumeric token | `GET /rest/catalogs/catalogs/token` |
 | `catalogs()->checkConnection(string $protocol, array $body = [])` | Check FTP/FTPS/SFTP connection | `POST /rest/catalogs/connection/check/{protocol}` |
+
+Since **v0.7.0**, `initiateExport()` starts asynchronous data generation using the
+connector's existing REST authentication and an empty request body. A successful
+start returns **HTTP 200 with an empty body**: do not call `json()` on it or expect
+a job ID. This only acknowledges the start; it does not mean the export is ready.
+The existing `export()` downloads the **catalog definition/configuration** and
+does not generate export data.
+
+```php
+$catalogId = '11111111-2222-4333-8444-555555555555';
+$started = $connector->catalogs()->initiateExport($catalogId);
+echo $started->status(); // 200; $started->body() is empty
+
+// Separately inspect statuses and identify the new run for this catalog.
+$statuses = $connector->catalogStatuses()->list(catalogId: $catalogId)->json();
+// Once you have selected its status ID from entries[n].status.id:
+$status = $connector->catalogStatuses()->get($statusId)->json();
+if ($status['status']['state'] === 'complete' && $status['status']['has_data'] && 0 === $status['errors']['count']) {
+    $downloadUrl = $status['urls']['download']['private'];
+    // Fetch the catalog's current file separately using the existing REST bearer token.
+}
+```
+
+Match the run to the start time and catalog; an older completed status or preview
+is not evidence that this start finished. Check the run's errors before consuming
+its file, then validate the downloaded content. The download URL is catalog-wide,
+not bound to a status ID: before completion it may serve an older file, and another
+run may replace it. Verify the file's freshness and content against the intended
+run. Status polling, run selection and file downloads remain the caller's
+responsibility; the SDK does not perform them automatically.
+
+If the start request times out, check the status list before starting it again:
+Plenty may already have accepted the first request.
 
 ### Catalog Statuses
 

@@ -25,6 +25,7 @@ use PlentyOne\Requests\Catalogs\GetCatalogTokenRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogVersionRequest;
 use PlentyOne\Requests\Catalogs\GetCatalogVersionsRequest;
 use PlentyOne\Requests\Catalogs\ImportCatalogRequest;
+use PlentyOne\Requests\Catalogs\InitiateCatalogExportRequest;
 use PlentyOne\Requests\Catalogs\MigrateCatalogRequest;
 use PlentyOne\Requests\Catalogs\RestoreCatalogRequest;
 use PlentyOne\Requests\Catalogs\UpdateCatalogContentRequest;
@@ -145,6 +146,12 @@ class CatalogsResource extends BaseResource
     public function export(string $id): Response
     {
         return $this->connector->send(new ExportCatalogRequest($id));
+    }
+
+    /** Starts data generation; HTTP 200 has an empty body, not a completed export. */
+    public function initiateExport(string $id): Response
+    {
+        return $this->connector->send(new InitiateCatalogExportRequest($id));
     }
 
     public function versions(string $id): Response
