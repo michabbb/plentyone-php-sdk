@@ -7,6 +7,7 @@ namespace PlentyOne\Resources;
 use PlentyOne\Requests\Orders\GetOrderRequest;
 use PlentyOne\Requests\Orders\SearchOrdersRequest;
 use PlentyOne\Requests\Reorders\CreateReorderRequest;
+use PlentyOne\Requests\Reorders\DeleteReorderItemRequest;
 use PlentyOne\Requests\Reorders\GetReorderDeliveryDateRequest;
 use PlentyOne\Requests\Reorders\UpdateReorderRequest;
 use Saloon\Http\BaseResource;
@@ -65,6 +66,15 @@ class ReordersResource extends BaseResource
     public function update(int $orderId, array $payload): Response
     {
         return $this->connector->send(new UpdateReorderRequest($orderId, $payload));
+    }
+
+    /**
+     * Delete one item (position) of a reorder via DELETE /rest/orders/{orderId}/items/{orderItemId}.
+     * Add or change items with update(); to replace the item list, delete the old items and add new ones.
+     */
+    public function deleteItem(int $orderId, int $orderItemId): Response
+    {
+        return $this->connector->send(new DeleteReorderItemRequest($orderId, $orderItemId));
     }
 
     /**

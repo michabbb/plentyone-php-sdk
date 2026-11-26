@@ -424,6 +424,7 @@ not infer that an unsupported filter worked merely because the response was succ
 |--------|-------------|-------------|
 | `reorders()->create(array $payload)` | Create header and items; requires explicit statusId and enforces typeId 12 | `POST /rest/reorders` |
 | `reorders()->update(int $orderId, array $payload)` | Update header or items | `PUT /rest/reorders/{orderId}` |
+| `reorders()->deleteItem(int $orderId, int $orderItemId)` | Delete one item (position) of a reorder | `DELETE /rest/orders/{orderId}/items/{orderItemId}` |
 | `tags()->link(int $tagId, 'order', int $orderId)` | Attach a tag to the created reorder | `POST /rest/tags/relationships` |
 | `reorders()->get(int $orderId, ?array $with = null)` | Get a type-12 order with its items and related data | `GET /rest/orders/{orderId}` |
 | `reorders()->search(array $filters = [])` | Search type-12 orders with related data (paginated) | `GET /rest/orders/search` |
@@ -464,6 +465,14 @@ array to select other supported relations; `[]` requests only API defaults.
 type. `search()` always enforces `orderTypeId = 12`, even if a different value is
 passed, and returns one page; use `entries`, `isLastPage` and `lastPageNumber` to
 read further pages. The order-search filter limitations above still apply.
+
+Items in `update($orderId, ['orderItems' => [...]])` with an `id` are changed, items
+without `id` are added, and items left out stay unchanged (verified live on Santos).
+To replace items, delete the old ones with `deleteItem()` and add the new ones via
+`update()`. Only change items while the reorder is
+still open (Santos: status 19); do not send a status or purchase date (type 16) in the
+same payload, because that can initiate the ordering workflow. `deleteItem()` uses the
+generic order-item endpoint and does not check the order type.
 
 `deliveryDate()` returns PlentyONE's calculated delivery date. It is not necessarily
 the same value as order date type 11 stored on the reorder.

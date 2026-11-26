@@ -113,9 +113,18 @@ class ReordersResourceTest extends TestCase
         self::assertSame($payload, json_decode((string) $response->getPsrRequest()->getBody(), true, flags: JSON_THROW_ON_ERROR));
     }
 
+    public function testItDeletesASingleReorderItem(): void
+    {
+        $response = $this->connector(MockResponse::make([], 200))->reorders()->deleteItem(12345, 101);
+
+        self::assertSame('DELETE', $response->getPsrRequest()->getMethod());
+        self::assertSame('/rest/orders/12345/items/101', $response->getPsrRequest()->getUri()->getPath());
+        self::assertSame('', (string) $response->getPsrRequest()->getBody());
+    }
+
     public function testWriteErrorsAreNotSwallowedOrRetried(): void
     {
-        foreach (['create', 'update'] as $method) {
+        foreach (['create', 'update', 'deleteItem'] as $method) {
             $mock      = new MockClient([MockResponse::make(['error' => 'Invalid data'], 422)]);
             $connector = new PlentyOneConnector('https://plenty.example.test/rest');
             $connector->withMockClient($mock);
@@ -123,8 +132,10 @@ class ReordersResourceTest extends TestCase
             try {
                 if ($method === 'create') {
                     $connector->reorders()->create(['statusId' => 19]);
-                } else {
+                } elseif ($method === 'update') {
                     $connector->reorders()->update(12345, ['statusId' => 19]);
+                } else {
+                    $connector->reorders()->deleteItem(12345, 101);
                 }
                 self::fail('API errors must propagate.');
             } catch (RequestException $exception) {
