@@ -295,6 +295,7 @@ foreach ($referrers as $r) {
 | `orders()->get(int $orderId, ?array $with)` | Get a single order by ID | `GET /rest/orders/{orderId}` |
 | `orders()->statuses(?string $lang, ?int $page, ?int $itemsPerPage)` | List the configured order statuses (id + names, paginated) | `GET /rest/orders/statuses` |
 | `orders()->itemTransactions(int $orderId, ?int $page, ?int $itemsPerPage)` | List item stock transactions for one order (paginated) | `GET /rest/orders/items/transactions` |
+| `orders()->items(int $orderId, int $page = 1, int $itemsPerPage = 50)` | List one page of an order's items, sorted by item ID ascending | `GET /rest/orders/{orderId}/items` |
 | `orders()->update(int $orderId, array $body)` | Update an order (send only changed fields) | `PUT /rest/orders/{orderId}` |
 | `orders()->setStatus(int $orderId, int\|float\|string $statusId)` | Convenience: change an order's status | `PUT /rest/orders/{orderId}` |
 
@@ -417,6 +418,30 @@ $connector->orders()->update(12345, ['statusId' => 7]);
 returns HTTP 200 while silently ignoring an array of order IDs and the tested
 `createdAt...` / `updatedAt...` range filters. Use the pagination envelope and do
 not infer that an unsupported filter worked merely because the response was successful.
+
+#### Order items, page by page
+
+`orders()->items(int $orderId, int $page = 1, int $itemsPerPage = 50)` reads one page
+of an order's items via `GET /rest/orders/{orderId}/items`, always sorted by item ID
+ascending (`sortBy=id`, `sortOrder=asc`). `$orderId` and `$page` must be positive and
+`$itemsPerPage` between 1 and 250; invalid values throw `InvalidArgumentException`
+before any request is sent.
+
+```php
+$page = 1;
+do {
+    $response = $connector->orders()->items(1000001, $page, 250);
+    $entries  = $response->json('entries'); // each entry includes its amounts
+    $page++;
+} while ($response->json('isLastPage') === false);
+```
+
+The response, including `totalsCount`, `isLastPage`, `lastPageNumber` and the entries
+with their amounts, is returned unchanged. The SDK does not iterate pages or check
+completeness: the caller must read every page and verify a stable `totalsCount`, unique
+item IDs, the `orderId` of every entry and that the number of items read equals
+`totalsCount`. Each page is a separate request, so concurrent changes to the order can
+shift results between pages; this is not an atomic snapshot.
 
 ### Reorders
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PlentyOne\Resources;
 
+use PlentyOne\Requests\Orders\GetOrderItemsRequest;
 use PlentyOne\Requests\Orders\GetOrderItemTransactionsRequest;
 use PlentyOne\Requests\Orders\GetOrderRequest;
 use PlentyOne\Requests\Orders\GetOrderStatusesRequest;
@@ -98,6 +99,22 @@ class OrdersResource extends BaseResource
     public function statuses(?string $lang = null, ?int $page = null, ?int $itemsPerPage = null): Response
     {
         return $this->connector->send(new GetOrderStatusesRequest($lang, $page, $itemsPerPage));
+    }
+
+    /**
+     * List the items (positions) of one order — one page, sorted by item ID ascending.
+     *
+     * GET /rest/orders/{orderId}/items
+     *
+     * `$orderId` and `$page` must be positive, `$itemsPerPage` 1–250; invalid values throw
+     * `InvalidArgumentException` without sending a request. The response (pagination envelope
+     * and entries, including their amounts) is returned unchanged. The SDK does not iterate
+     * pages or check completeness: the caller reads all pages and verifies totals, unique IDs
+     * and orderId. Pages are separate requests, so concurrent changes can shift results.
+     */
+    public function items(int $orderId, int $page = 1, int $itemsPerPage = 50): Response
+    {
+        return $this->connector->send(new GetOrderItemsRequest($orderId, $page, $itemsPerPage));
     }
 
     /**
