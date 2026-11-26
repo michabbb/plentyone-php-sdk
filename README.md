@@ -474,6 +474,31 @@ still open (Santos: status 19); do not send a status or purchase date (type 16) 
 same payload, because that can initiate the ordering workflow. `deleteItem()` uses the
 generic order-item endpoint and does not check the order type.
 
+To change the price of an existing item, send the id of its amount (verified live):
+
+```php
+$connector->reorders()->update($orderId, ['orderItems' => [[
+    'id'       => $orderItemId,
+    'quantity' => 5,
+    'amounts'  => [['id' => $amountId, 'priceOriginalGross' => 3.25]],
+]]]);
+```
+
+#### Local write test scripts (never committed)
+
+Write tests against a live system are kept as local `test_reorder_*.php` scripts in the
+project root. They match `test*.php` in `.gitignore` and must never be committed, nor
+must credentials. They read `PLENTY_URL`, `PLENTY_USER`, `PLENTY_PASSWORD` from the
+environment or from a dotenv file named by `PLENTY_ENV_FILE`, always create reorders in
+status 19, and only change status-19 reorders of the test supplier unless
+`--allow-real-supplier` is passed.
+
+```bash
+php test_reorder_create.php --item='1026:1:12.64:Item name'            # new reorder
+php test_reorder_replace_items.php --order-id=ID --item='11468:2:1.00:Name'  # replace all items
+php test_reorder_update_item.php --order-id=ID --item-id=ITEM --quantity=5 --price=3.25
+```
+
 `deliveryDate()` returns PlentyONE's calculated delivery date. It is not necessarily
 the same value as order date type 11 stored on the reorder.
 
